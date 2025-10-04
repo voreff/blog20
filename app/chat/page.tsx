@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -130,7 +129,7 @@ export default function ChatPage() {
           setCurrentUser(JSON.parse(user))
           localStorage.setItem("blog_login_time", Date.now().toString())
         } else {
-          // Token expired, clear storage and redirect with alert
+          // Token expired, clear storage and redirect
           localStorage.removeItem("blog_token")
           localStorage.removeItem("blog_user")
           localStorage.removeItem("blog_login_time")
@@ -138,7 +137,8 @@ export default function ChatPage() {
           router.push("/")
         }
       } catch (error) {
-        // Network error, clear storage and redirect with alert
+        // Network error or invalid token, clear storage and redirect
+        console.error("Session validation failed:", error)
         localStorage.removeItem("blog_token")
         localStorage.removeItem("blog_user")
         localStorage.removeItem("blog_login_time")
@@ -146,7 +146,7 @@ export default function ChatPage() {
         router.push("/")
       }
     } else {
-      // No token or user, redirect with alert
+      // No token or user, redirect to login with alert
       alert("Chatga kirish uchun avval login qiling")
       router.push("/")
     }
