@@ -115,7 +115,6 @@ export default function ChatPage() {
   const checkUserSession = async () => {
     const token = localStorage.getItem("blog_token")
     const user = localStorage.getItem("blog_user")
-    const loginTime = localStorage.getItem("blog_login_time")
 
     if (token && user) {
       try {
@@ -131,34 +130,25 @@ export default function ChatPage() {
           setCurrentUser(JSON.parse(user))
           localStorage.setItem("blog_login_time", Date.now().toString())
         } else {
-          // Token expired, clear storage and redirect
+          // Token expired, clear storage and redirect with alert
           localStorage.removeItem("blog_token")
           localStorage.removeItem("blog_user")
           localStorage.removeItem("blog_login_time")
+          alert("Chatga kirish uchun avval login qiling")
           router.push("/")
         }
       } catch (error) {
-        // Network error or static mode, set user for demo purposes
-        console.log("Session validation failed, setting demo user for static mode")
-        setCurrentUser(JSON.parse(user))
-      }
-    } else {
-      // For static demo, create a demo user if none exists
-      if (typeof window !== 'undefined' && !token && !user) {
-        const demoUser = {
-          id: 1,
-          username: "demo_user",
-          email: "demo@example.com",
-          avatar: "default-avatar.png"
-        }
-        setCurrentUser(demoUser)
-        localStorage.setItem("blog_user", JSON.stringify(demoUser))
-        localStorage.setItem("blog_token", "demo_token")
-        localStorage.setItem("blog_login_time", Date.now().toString())
-      } else {
-        // No token or user, redirect to login
+        // Network error, clear storage and redirect with alert
+        localStorage.removeItem("blog_token")
+        localStorage.removeItem("blog_user")
+        localStorage.removeItem("blog_login_time")
+        alert("Chatga kirish uchun avval login qiling")
         router.push("/")
       }
+    } else {
+      // No token or user, redirect with alert
+      alert("Chatga kirish uchun avval login qiling")
+      router.push("/")
     }
   }
 
