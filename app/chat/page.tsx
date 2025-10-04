@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+
 import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -114,6 +115,7 @@ export default function ChatPage() {
   const checkUserSession = async () => {
     const token = localStorage.getItem("blog_token")
     const user = localStorage.getItem("blog_user")
+    const loginTime = localStorage.getItem("blog_login_time")
 
     if (token && user) {
       try {
@@ -133,22 +135,30 @@ export default function ChatPage() {
           localStorage.removeItem("blog_token")
           localStorage.removeItem("blog_user")
           localStorage.removeItem("blog_login_time")
-          alert("Chatga kirish uchun avval login qiling")
           router.push("/")
         }
       } catch (error) {
-        // Network error or invalid token, clear storage and redirect
-        console.error("Session validation failed:", error)
-        localStorage.removeItem("blog_token")
-        localStorage.removeItem("blog_user")
-        localStorage.removeItem("blog_login_time")
-        alert("Chatga kirish uchun avval login qiling")
-        router.push("/")
+        // Network error or static mode, set user for demo purposes
+        console.log("Session validation failed, setting demo user for static mode")
+        setCurrentUser(JSON.parse(user))
       }
     } else {
-      // No token or user, redirect to login with alert
-      alert("Chatga kirish uchun avval login qiling")
-      router.push("/")
+      // For static demo, create a demo user if none exists
+      if (typeof window !== 'undefined' && !token && !user) {
+        const demoUser = {
+          id: 1,
+          username: "demo_user",
+          email: "demo@example.com",
+          avatar: "default-avatar.png"
+        }
+        setCurrentUser(demoUser)
+        localStorage.setItem("blog_user", JSON.stringify(demoUser))
+        localStorage.setItem("blog_token", "demo_token")
+        localStorage.setItem("blog_login_time", Date.now().toString())
+      } else {
+        // No token or user, redirect to login
+        router.push("/")
+      }
     }
   }
 
